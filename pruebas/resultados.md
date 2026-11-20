@@ -17,8 +17,7 @@ Se completa cada vez que Facu sube un modelo nuevo, corriendo `pruebas/evaluar.p
 
 | Fecha | Versión del modelo | Dibujos por categoría usados para entrenar | % Quick, Draw! (top-1) | % Dibujos propios (top-1) | % Top-3 (propios) | Cantidad de dibujos propios evaluados | ¿OK? | Notas |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| aaaa-mm-dd | v0 (provisorio) | | | | | | No | |
-| | | | | | | | | |
+| 2026-11-20 | modelo.pt (2026-11-16T09:00, provisorio) | 3000 | 89.6% | 100.0% | 100.0% | 14 | No | Primera prueba: solo 14 dibujos de 7 categorías, hechos por Ivo |
 
 ---
 
