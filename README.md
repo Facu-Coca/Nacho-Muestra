@@ -29,7 +29,22 @@ python reentrenar.py          # suma los dibujos guardados en la muestra (datos_
 En una notebook sin placa de video, el entrenamiento completo tarda alrededor de 1 hora
 (unos 10 minutos por época). Si la compu tiene placa NVIDIA, `entrenar.py` la usa sola:
 instalar torch con CUDA (`pip install torch --index-url https://download.pytorch.org/whl/cu128`)
-y tarda unos minutos. Al empezar dice con qué está entrenando.
+y tarda unos minutos (con una GTX 1650: unos 80 segundos por época, 8 a 9 minutos en total;
+no tener un juego abierto mientras entrena porque tarda más del doble). Al empezar dice con qué está entrenando.
+
+## Modelo actual
+
+`modelo.pt` (20/11/2026): 20.000 dibujos por categoría, 6 épocas.
+
+| Medida | Meta | Resultado |
+| --- | --- | --- |
+| Aciertos con dibujos de prueba de Quick, Draw! (50.000) | más de 90% | **94,2%** |
+| Correcta entre las 3 primeras | más de 95% | **97,7%** |
+
+Las que menos acierta: llave (88%) y araña (89%). Lo que más confunde: araña y sol
+(5% y 3,5%), flor y árbol (2,5%), gato y elefante (2,2%). Ninguna llega al 5% que sería
+para cambiar la categoría. Los aciertos con dibujos propios los mide Ivo con
+`pruebas/evaluar.py` (ver `pruebas/resultados.md`).
 
 Para cambiar categorías: editar `categorias.txt` (nombre en inglés exacto de
 [la lista de Quick, Draw!](https://github.com/googlecreativelab/quickdraw-dataset/blob/master/categories.txt),
