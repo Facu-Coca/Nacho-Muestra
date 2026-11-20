@@ -11,6 +11,7 @@ const GROSOR = 9;
 
 let dibujando = false;
 let ultimo = null;
+let lienzoBloqueado = false;   // juego.js lo pone en true cuando se acaba el tiempo
 
 function prepararPincel() {
   ctx.lineWidth = GROSOR;
@@ -38,6 +39,7 @@ function posicion(e) {
 }
 
 function empezar(e) {
+  if (lienzoBloqueado) return;
   if (e.pointerType === "mouse" && e.button !== 0) return; // solo botón izquierdo
   e.preventDefault();
   dibujando = true;
@@ -51,7 +53,7 @@ function empezar(e) {
 }
 
 function mover(e) {
-  if (!dibujando) return;
+  if (!dibujando || lienzoBloqueado) return;
   e.preventDefault();
   const p = posicion(e);
   ctx.beginPath();
@@ -138,6 +140,8 @@ async function predecir() {
       mostrarPista("Empezá a dibujar y la IA te va a ir diciendo qué ve.");
     } else {
       mostrarOpciones(res.top);
+      // Aviso para que juego.js pueda ver si la IA acertó
+      lienzo.dispatchEvent(new CustomEvent("prediccion", { detail: res }));
     }
   } catch (err) {
     if (miVersion === version) mostrarPista("No me puedo conectar con el servidor.");

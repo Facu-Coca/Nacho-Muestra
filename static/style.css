@@ -111,8 +111,8 @@ body {
 #lienzo {
   display: block;
   /* cuadrado grande, que entre en la altura de la pantalla */
-  width: min(56vh, 46vw);
-  height: min(56vh, 46vw);
+  width: min(60vh, 46vw);
+  height: min(60vh, 46vw);
   min-width: 260px;
   min-height: 260px;
   background: #fff;       /* fondo blanco: lo necesita procesamiento.py */
@@ -151,6 +151,44 @@ body {
 }
 .panel-ia h2 { margin: 0 0 10px; font-size: 1.8rem; }
 .pista { color: var(--tinta-suave); font-size: 1.15rem; margin: 0; }
+
+/* ---------- Consigna y reloj ---------- */
+.columna-derecha { display: flex; flex-direction: column; gap: 22px; }
+
+.consigna {
+  background: #fff;
+  border: 3px solid var(--tinta);
+  border-radius: 10px;
+  box-shadow: var(--sombra);
+  padding: 14px 22px 18px;
+  transform: rotate(.4deg);
+}
+.consigna-contador { font-size: 1.1rem; color: var(--tinta-suave); }
+.consigna-texto { font-size: clamp(1.8rem, 3.2vw, 2.8rem); font-weight: bold; margin: 2px 0 10px; }
+.resaltado {
+  background: linear-gradient(transparent 55%, var(--resaltador) 55%, var(--resaltador) 92%, transparent 92%);
+  padding: 0 .2em;
+  text-transform: capitalize;
+}
+
+.reloj { display: flex; align-items: center; gap: 14px; }
+.reloj-fondo {
+  flex: 1;
+  height: 22px;
+  background: #fff;
+  border: 2px solid var(--tinta);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.reloj-barra { height: 100%; width: 100%; background: var(--acento); }
+.reloj-barra.urgente { background: #e0483f; }
+.reloj-segundos { font-size: 2.2rem; font-weight: bold; min-width: 2ch; text-align: right; }
+.reloj-segundos.urgente { color: #e0483f; }
+
+.mensaje-ronda { font-size: 1.6rem; font-weight: bold; margin: 12px 0 8px; }
+.mensaje-ronda.ok { color: #1f8a4c; }
+.mensaje-ronda.mal { color: var(--tinta); }
+.detalle-ronda { font-size: 1.2rem; color: var(--tinta-suave); margin: 0 0 10px; }
 
 /* Barras de las 3 opciones */
 .opcion {

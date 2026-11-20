@@ -39,12 +39,27 @@
           </div>
         </section>
 
-        <aside class="panel-ia">
-          <h2>La IA ve...</h2>
-          <div id="opciones" class="opciones">
-            <p class="pista">Empezá a dibujar y la IA te va a ir diciendo qué ve.</p>
-          </div>
-        </aside>
+        <div class="columna-derecha">
+          <!-- Consigna: qué dibujar y cuánto tiempo queda -->
+          <section class="consigna" aria-live="polite">
+            <div id="contador-dibujos" class="consigna-contador">Dibujo 1 de 6</div>
+            <div class="consigna-texto">Dibujá: <span id="categoria-pedida" class="resaltado">...</span></div>
+            <div class="reloj">
+              <div class="reloj-fondo"><div id="reloj-barra" class="reloj-barra"></div></div>
+              <span id="reloj-segundos" class="reloj-segundos">20</span>
+            </div>
+            <p id="mensaje-ronda" class="mensaje-ronda" hidden></p>
+            <p id="detalle-ronda" class="detalle-ronda" hidden></p>
+            <button id="siguiente" type="button" class="boton" hidden>Siguiente dibujo</button>
+          </section>
+
+          <aside class="panel-ia">
+            <h2>La IA ve...</h2>
+            <div id="opciones" class="opciones">
+              <p class="pista">Empezá a dibujar y la IA te va a ir diciendo qué ve.</p>
+            </div>
+          </aside>
+        </div>
       </main>
     </div>
   </section>
@@ -67,5 +82,6 @@
 
   <script src="{{ url_for('static', filename='app.js') }}"></script>
   <script src="{{ url_for('static', filename='navegacion.js') }}"></script>
+  <script src="{{ url_for('static', filename='juego.js') }}"></script>
 </body>
 </html>
