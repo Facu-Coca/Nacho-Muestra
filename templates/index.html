@@ -1,72 +1,71 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prueba del modelo</title>
-<!-- PAGINA PROVISORIA DE FACU para probar el servidor. Sebas la reemplaza por la del juego. -->
-<style>
-  body { font-family: sans-serif; display: flex; gap: 24px; padding: 16px; flex-wrap: wrap; }
-  canvas { border: 2px solid #333; touch-action: none; background: #fff; }
-  .barra { background: #4a7; height: 22px; margin: 4px 0 12px; }
-  #vista { width: 140px; height: 140px; image-rendering: pixelated; background: #000; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adiviná el Dibujo con IA</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div>
-    <canvas id="lienzo" width="400" height="400"></canvas><br>
-    <button id="borrar">Borrar</button>
-    <select id="pedida"></select>
-    <button id="guardar">Guardar dibujo</button>
-    <span id="estado"></span>
-  </div>
-  <div>
-    <h3>La IA ve...</h3>
-    <div id="opciones"></div>
-    <h3>Lo que ve (28×28)</h3>
-    <img id="vista" alt="">
-  </div>
-<script>
-const lienzo = document.getElementById("lienzo");
-const ctx = lienzo.getContext("2d");
-let dibujando = false, cambio = false;
+  <header class="cabecera">
+    <h1>Adiviná el Dibujo <span class="subrayado">con IA</span></h1>
+    <nav class="menu" aria-label="Secciones">
+      <button type="button" class="pestana activa" data-pestana="jugar">Jugar</button>
+      <button type="button" class="pestana" data-pestana="como">Cómo funciona</button>
+      <button type="button" class="pestana" data-pestana="stats">Estadísticas</button>
+    </nav>
+  </header>
 
-function limpiar() {
-  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, lienzo.width, lienzo.height);
-  document.getElementById("opciones").innerHTML = "";
-  document.getElementById("vista").removeAttribute("src");
-}
-limpiar();
-ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#000";
+  <!-- ============ PESTAÑA: JUGAR ============ -->
+  <section id="pestana-jugar" class="pestana-contenido">
 
-function punto(e) { const r = lienzo.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
-lienzo.addEventListener("pointerdown", e => { dibujando = true; ctx.beginPath(); ctx.moveTo(...punto(e)); });
-lienzo.addEventListener("pointermove", e => { if (!dibujando) return; ctx.lineTo(...punto(e)); ctx.stroke(); cambio = true; });
-addEventListener("pointerup", () => dibujando = false);
-document.getElementById("borrar").onclick = limpiar;
+    <!-- Pantalla de inicio -->
+    <div id="pantalla-inicio" class="pantalla inicio">
+      <div class="tarjeta-inicio">
+        <h2>¿La IA adivina tu dibujo?</h2>
+        <p>Te voy a pedir <strong>6 dibujos</strong>. Tenés <strong>20 segundos</strong> para cada uno.</p>
+        <p>Mientras dibujás, la IA va diciendo lo que ve.</p>
+        <button id="jugar" type="button" class="boton grande">Jugar</button>
+      </div>
+    </div>
 
-async function enviar(ruta, datos) {
-  const r = await fetch(ruta, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(datos) });
-  return r.json();
-}
+    <!-- Pantalla del juego (el lienzo y las barras de la IA) -->
+    <div id="pantalla-juego" class="pantalla" hidden>
+      <main class="juego">
+        <section class="hoja">
+          <canvas id="lienzo" width="600" height="600" aria-label="Lienzo para dibujar"></canvas>
+          <div class="botones">
+            <button id="borrar" type="button" class="boton">Borrar</button>
+          </div>
+        </section>
 
-setInterval(async () => {
-  if (!cambio) return;
-  cambio = false;
-  const res = await enviar("/predecir", { imagen: lienzo.toDataURL("image/png") });
-  if (res.vacio) return;
-  document.getElementById("opciones").innerHTML = res.top.map(o =>
-    `${o.categoria} ${(o.prob * 100).toFixed(0)}%<div class="barra" style="width:${o.prob * 300}px"></div>`).join("");
-  document.getElementById("vista").src = res.vista_ia;
-}, 500);
+        <aside class="panel-ia">
+          <h2>La IA ve...</h2>
+          <div id="opciones" class="opciones">
+            <p class="pista">Empezá a dibujar y la IA te va a ir diciendo qué ve.</p>
+          </div>
+        </aside>
+      </main>
+    </div>
+  </section>
 
-fetch("/categorias").then(r => r.json()).then(lista => {
-  document.getElementById("pedida").innerHTML = lista.map(c => `<option>${c}</option>`).join("");
-});
-document.getElementById("guardar").onclick = async () => {
-  const res = await enviar("/guardar", { imagen: lienzo.toDataURL("image/png"), categoria: document.getElementById("pedida").value });
-  document.getElementById("estado").textContent = res.guardado ? `Guardado (creyó: ${res.creyo})` : (res.motivo || res.error);
-};
-</script>
+  <!-- ============ PESTAÑA: CÓMO FUNCIONA ============ -->
+  <section id="pestana-como" class="pestana-contenido" hidden>
+    <div class="tarjeta-inicio">
+      <h2>Cómo funciona</h2>
+      <p class="pista">Acá va a ir la explicación de cómo la IA ve y decide. (Próximamente)</p>
+    </div>
+  </section>
+
+  <!-- ============ PESTAÑA: ESTADÍSTICAS ============ -->
+  <section id="pestana-stats" class="pestana-contenido" hidden>
+    <div class="tarjeta-inicio">
+      <h2>Estadísticas</h2>
+      <p class="pista">Acá van a ir los dibujos jugados y cuánto acierta la IA. (Próximamente)</p>
+    </div>
+  </section>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <script src="{{ url_for('static', filename='navegacion.js') }}"></script>
 </body>
 </html>
