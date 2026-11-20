@@ -1,0 +1,6 @@
+flask
+numpy
+pillow
+# PyTorch version CPU (no hace falta placa de video):
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch

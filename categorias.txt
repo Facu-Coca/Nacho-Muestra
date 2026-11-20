@@ -1,0 +1,39 @@
+# Una categoria por linea: nombre_en_ingles,nombre_en_castellano
+# El nombre en ingles tiene que ser exacto al de Quick, Draw! (es el del archivo a descargar).
+# Lista completa: https://github.com/googlecreativelab/quickdraw-dataset/blob/master/categories.txt
+# Elegidas por Vicente. Pares con riesgo de confusion: sol/flor, anteojos/bicicleta, arana/sol.
+
+# Animales
+cat,gato
+elephant,elefante
+fish,pez
+butterfly,mariposa
+snake,serpiente
+spider,araña
+
+# Objetos
+bicycle,bicicleta
+umbrella,paraguas
+book,libro
+scissors,tijera
+eyeglasses,anteojos
+guitar,guitarra
+key,llave
+chair,silla
+hat,sombrero
+
+# Comida
+apple,manzana
+banana,banana
+pizza,pizza
+ice cream,helado
+
+# Lugares y naturaleza
+house,casa
+tree,árbol
+flower,flor
+sun,sol
+
+# Transporte
+airplane,avión
+car,auto

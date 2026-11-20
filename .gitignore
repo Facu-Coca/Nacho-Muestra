@@ -1,0 +1,15 @@
+# Datos de Quick, Draw! descargados (son pesados, se bajan con descargar.py)
+datos/
+*.npy.parcial
+
+# Dibujos guardados durante la muestra
+datos_muestra/
+
+# Copias de modelos (modelo_anterior.pt de reentrenar.py, pruebas). Solo se sube modelo.pt
+modelo_*.pt
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
