@@ -6,8 +6,8 @@ const TOTAL_DIBUJOS = 6;
 const SEGUNDOS_POR_DIBUJO = 20;
 const SEGUNDOS_URGENTE = 5;          // de acá para abajo el reloj se pone rojo
 const PAUSA_ENTRE_DIBUJOS_MS = 2500; // cuánto se ve el resultado antes de pasar al siguiente
-const PROB_MINIMA = 0;               // 0 = alcanza con que la IA ponga la correcta primera.
-                                     // Si en el ensayo "adivina" garabatos, subirlo (ej: 0.4).
+const PROB_MINIMA = 0.6;             // la IA tiene que poner la correcta primera y con más de 60%.
+                                     // Con 0 cortaba el dibujo a los 2 trazos; si sigue cortando muy pronto, subirlo.
 
 // Para decir "¡Es un elefante!" / "¡Es una mariposa!". Si se cambian las categorías,
 // agregar acá las que sean femeninas o plurales (las demás van con "un").
