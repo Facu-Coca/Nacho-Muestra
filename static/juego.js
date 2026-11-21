@@ -8,6 +8,7 @@ const SEGUNDOS_URGENTE = 5;          // de acá para abajo el reloj se pone rojo
 const PAUSA_ENTRE_DIBUJOS_MS = 2500; // cuánto se ve el resultado antes de pasar al siguiente
 const PROB_MINIMA = 0.6;             // la IA tiene que poner la correcta primera y con más de 60%.
                                      // Con 0 cortaba el dibujo a los 2 trazos; si sigue cortando muy pronto, subirlo.
+const GRACIA_MS = 1500;              // como Quick, Draw!: cuando adivina, deja seguir dibujando un momento
 
 // Para decir "¡Es un elefante!" / "¡Es una mariposa!". Si se cambian las categorías,
 // agregar acá las que sean femeninas o plurales (las demás van con "un").
@@ -126,9 +127,20 @@ async function guardarDibujo(resultado) {
   }
 }
 
+// La IA acertó: avisa y para el reloj, pero deja seguir dibujando GRACIA_MS antes de cerrar.
+function adivinar() {
+  if (estado !== "dibujando") return;
+  estado = "adivinado";
+  clearInterval(temporizador);
+  elMensaje.textContent = fraseEs(ronda.pedidas[ronda.indice]);
+  elMensaje.className = "mensaje-ronda ok";
+  elMensaje.hidden = false;
+  pausa = setTimeout(() => terminarDibujo(true), GRACIA_MS);
+}
+
 // Cierra el dibujo actual. adivino = true si la IA lo acertó, false si se acabó el tiempo.
 function terminarDibujo(adivino) {
-  if (estado !== "dibujando") return;   // ya se resolvió (evita contar dos veces)
+  if (estado !== "dibujando" && estado !== "adivinado") return;   // ya se resolvió (evita contar dos veces)
   estado = "terminado";
   clearInterval(temporizador);
   lienzoBloqueado = true;
@@ -223,7 +235,7 @@ lienzo.addEventListener("prediccion", (e) => {
   if (!top || top.length === 0) return;
   ultimaOpcion = top[0];
   if (top[0].categoria === ronda.pedidas[ronda.indice] && top[0].prob >= PROB_MINIMA) {
-    terminarDibujo(true);
+    adivinar();
   }
 });
 
