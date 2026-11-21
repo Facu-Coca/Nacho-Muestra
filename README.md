@@ -61,9 +61,16 @@ coma, nombre en castellano), correr `descargar.py` y `entrenar.py`.
 | `procesamiento.py` | Pasa el dibujo del lienzo a 28×28 como los de Quick, Draw! |
 | `descargar.py` | Baja los `.npy` de Quick, Draw! |
 | `categorias.txt` | Las 25 categorías |
-| `templates/`, `static/` | La página (Sebas). El `index.html` actual es una página de prueba |
+| `templates/`, `static/` | La página del juego (Sebas) |
 | `pruebas/` | Dibujos de prueba y script de evaluación (Ivo) |
 | `docs/` | Textos, cartel y guion (Vicente) |
+
+## Documentos (`docs/`)
+
+| Archivo | Qué es |
+| --- | --- |
+| `docs/parte-de-vicente.pdf` | Categorías, explicación de la red neuronal, textos de "Cómo funciona", preguntas frecuentes, guion de la presentación y registro de uso de IA |
+| `docs/cartel.jpeg` | Cartel para la mesa de la muestra |
 
 ## Contrato entre la página y el servidor
 
