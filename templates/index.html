@@ -1,72 +1,176 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prueba del modelo</title>
-<!-- PAGINA PROVISORIA DE FACU para probar el servidor. Sebas la reemplaza por la del juego. -->
-<style>
-  body { font-family: sans-serif; display: flex; gap: 24px; padding: 16px; flex-wrap: wrap; }
-  canvas { border: 2px solid #333; touch-action: none; background: #fff; }
-  .barra { background: #4a7; height: 22px; margin: 4px 0 12px; }
-  #vista { width: 140px; height: 140px; image-rendering: pixelated; background: #000; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>¿Qué estoy dibujando?</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div>
-    <canvas id="lienzo" width="400" height="400"></canvas><br>
-    <button id="borrar">Borrar</button>
-    <select id="pedida"></select>
-    <button id="guardar">Guardar dibujo</button>
-    <span id="estado"></span>
-  </div>
-  <div>
-    <h3>La IA ve...</h3>
-    <div id="opciones"></div>
-    <h3>Lo que ve (28×28)</h3>
-    <img id="vista" alt="">
-  </div>
-<script>
-const lienzo = document.getElementById("lienzo");
-const ctx = lienzo.getContext("2d");
-let dibujando = false, cambio = false;
+  <header class="cabecera">
+    <h1>¿Qué estoy <span class="subrayado">dibujando</span>?</h1>
+    <nav class="menu" aria-label="Secciones">
+      <button type="button" class="pestana activa" data-pestana="jugar">Jugar</button>
+      <button type="button" class="pestana" data-pestana="como">Cómo funciona</button>
+      <button type="button" class="pestana" data-pestana="stats">Estadísticas</button>
+    </nav>
+  </header>
 
-function limpiar() {
-  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, lienzo.width, lienzo.height);
-  document.getElementById("opciones").innerHTML = "";
-  document.getElementById("vista").removeAttribute("src");
-}
-limpiar();
-ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#000";
+  <!-- ============ PESTAÑA: JUGAR ============ -->
+  <section id="pestana-jugar" class="pestana-contenido">
 
-function punto(e) { const r = lienzo.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
-lienzo.addEventListener("pointerdown", e => { dibujando = true; ctx.beginPath(); ctx.moveTo(...punto(e)); });
-lienzo.addEventListener("pointermove", e => { if (!dibujando) return; ctx.lineTo(...punto(e)); ctx.stroke(); cambio = true; });
-addEventListener("pointerup", () => dibujando = false);
-document.getElementById("borrar").onclick = limpiar;
+    <!-- Pantalla de inicio -->
+    <div id="pantalla-inicio" class="pantalla inicio">
+      <div class="tarjeta-inicio">
+        <h2>¿La IA adivina tu dibujo?</h2>
+        <p>Te voy a pedir <strong>6 dibujos</strong>. Tenés <strong>20 segundos</strong> para cada uno.</p>
+        <p>Mientras dibujás, la IA va diciendo lo que ve.</p>
+        <button id="jugar" type="button" class="boton grande">Jugar</button>
+      </div>
+    </div>
 
-async function enviar(ruta, datos) {
-  const r = await fetch(ruta, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(datos) });
-  return r.json();
-}
+    <!-- Pantalla del juego (el lienzo y las barras de la IA) -->
+    <div id="pantalla-juego" class="pantalla" hidden>
+      <main class="juego">
+        <section class="hoja">
+          <canvas id="lienzo" width="600" height="600" aria-label="Lienzo para dibujar"></canvas>
+          <div class="botones">
+            <button id="borrar" type="button" class="boton">Borrar</button>
+          </div>
+        </section>
 
-setInterval(async () => {
-  if (!cambio) return;
-  cambio = false;
-  const res = await enviar("/predecir", { imagen: lienzo.toDataURL("image/png") });
-  if (res.vacio) return;
-  document.getElementById("opciones").innerHTML = res.top.map(o =>
-    `${o.categoria} ${(o.prob * 100).toFixed(0)}%<div class="barra" style="width:${o.prob * 300}px"></div>`).join("");
-  document.getElementById("vista").src = res.vista_ia;
-}, 500);
+        <div class="columna-derecha">
+          <!-- Consigna: qué dibujar y cuánto tiempo queda -->
+          <section class="consigna" aria-live="polite">
+            <div id="contador-dibujos" class="consigna-contador">Dibujo 1 de 6</div>
+            <div class="consigna-texto">Dibujá: <span id="categoria-pedida" class="resaltado">...</span></div>
+            <div class="reloj">
+              <div class="reloj-fondo"><div id="reloj-barra" class="reloj-barra"></div></div>
+              <span id="reloj-segundos" class="reloj-segundos">20</span>
+            </div>
+            <p id="mensaje-ronda" class="mensaje-ronda" hidden></p>
+            <p id="detalle-ronda" class="detalle-ronda" hidden></p>
+          </section>
 
-fetch("/categorias").then(r => r.json()).then(lista => {
-  document.getElementById("pedida").innerHTML = lista.map(c => `<option>${c}</option>`).join("");
-});
-document.getElementById("guardar").onclick = async () => {
-  const res = await enviar("/guardar", { imagen: lienzo.toDataURL("image/png"), categoria: document.getElementById("pedida").value });
-  document.getElementById("estado").textContent = res.guardado ? `Guardado (creyó: ${res.creyo})` : (res.motivo || res.error);
-};
-</script>
+          <aside class="panel-ia">
+            <h2>La IA ve...</h2>
+            <div id="opciones" class="opciones">
+              <p class="pista">Empezá a dibujar y la IA te va a ir diciendo qué ve.</p>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <!-- Pantalla final: puntaje y los 6 dibujos con lo que creyó la IA -->
+    <div id="pantalla-final" class="pantalla final" hidden>
+      <h2 id="final-titulo" class="final-titulo">¡Terminaste!</h2>
+      <p id="final-puntaje" class="final-puntaje"></p>
+      <div id="final-dibujos" class="final-dibujos"></div>
+      <button id="jugar-de-nuevo" type="button" class="boton grande">Jugar de nuevo</button>
+    </div>
+  </section>
+
+  <!-- ============ PESTAÑA: CÓMO FUNCIONA ============ -->
+  <section id="pestana-como" class="pestana-contenido" hidden>
+    <div class="como">
+      <h2 class="como-titulo">Cómo funciona</h2>
+
+      <!-- Esquema: dibujo -> imagen 28x28 -> red neuronal -> resultado (usa tu último dibujo) -->
+      <div class="esquema">
+        <figure class="paso">
+          <div class="paso-caja"><img id="como-dibujo" alt="Tu último dibujo" hidden><span class="paso-vacio">?</span></div>
+          <figcaption>1. Tu dibujo</figcaption>
+        </figure>
+        <span class="flecha" aria-hidden="true">→</span>
+        <figure class="paso">
+          <div class="paso-caja"><img id="como-vista" class="pixelado" alt="Lo que ve la IA, 28 por 28 puntos" hidden><span class="paso-vacio">?</span></div>
+          <figcaption>2. Lo que ve la IA<br><small>(28×28 puntos)</small></figcaption>
+        </figure>
+        <span class="flecha" aria-hidden="true">→</span>
+        <figure class="paso">
+          <div class="paso-caja paso-red">
+            <span>rayitas y curvas</span><span class="mini-flecha">↓</span>
+            <span>formas más grandes</span><span class="mini-flecha">↓</span>
+            <span>decide la categoría</span>
+          </div>
+          <figcaption>3. La red neuronal<br><small>(analiza por capas)</small></figcaption>
+        </figure>
+        <span class="flecha" aria-hidden="true">→</span>
+        <figure class="paso">
+          <div class="paso-caja paso-resultado"><div id="como-resultado"><span class="paso-vacio">?</span></div></div>
+          <figcaption>4. El resultado<br><small>(las 3 más probables)</small></figcaption>
+        </figure>
+      </div>
+      <p id="como-aviso" class="como-aviso">Jugá una ronda y acá vas a ver lo que vio la IA en tu último dibujo.</p>
+
+      <!-- Textos de Vicente -->
+      <div class="como-textos">
+        <article class="como-texto">
+          <h3>Qué es esta IA</h3>
+          <p>Es una red neuronal, un programa que aprende mirando ejemplos en vez de seguir reglas escritas a mano. Es del mismo tipo que usan los celulares para reconocer caras u objetos en las fotos.</p>
+        </article>
+        <article class="como-texto">
+          <h3>Cómo aprendió</h3>
+          <p>La entrenamos con millones de dibujos hechos por gente de todo el mundo, del set público Quick, Draw!. Vio muchísimos elefantes, casas y bicicletas dibujados de mil formas distintas, y fue aprendiendo qué tienen en común los de cada categoría.</p>
+        </article>
+        <article class="como-texto">
+          <h3>Qué ve cuando dibujás</h3>
+          <p>La IA no ve tu dibujo como lo ves vos: lo convierte en una imagen chiquita de 28×28 puntos, en blanco y negro. Con esa imagen calcula qué tan parecido es a cada una de las 25 cosas que conoce, y te muestra las 3 más probables.</p>
+        </article>
+        <article class="como-texto">
+          <h3>Por qué a veces se equivoca</h3>
+          <p>Solo conoce 25 categorías, y algunas se parecen entre sí. Además, si el dibujo es muy chico, está incompleto o tiene un garabato, la imagen que ve queda confusa. No piensa ni entiende: compara formas, y las compara con lo que aprendió.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PESTAÑA: ESTADÍSTICAS ============ -->
+  <section id="pestana-stats" class="pestana-contenido" hidden>
+    <div class="stats">
+      <h2 class="como-titulo">Estadísticas</h2>
+
+      <div id="stats-vacio" class="tarjeta-inicio" hidden>
+        <h2>Todavía no hay dibujos</h2>
+        <p>Jugá una ronda y acá vas a ver cuánto acierta la IA.</p>
+      </div>
+      <div id="stats-error" class="tarjeta-inicio" hidden>
+        <h2>No pude cargar las estadísticas</h2>
+        <p>Fijate que el servidor (python app.py) esté corriendo.</p>
+      </div>
+
+      <div id="stats-contenido" class="stats-contenido" hidden>
+        <div class="stats-izq">
+          <div class="stats-numeros">
+            <div class="numero-tarjeta">
+              <div id="stats-jugados" class="numero-grande">0</div>
+              <div>dibujos jugados</div>
+            </div>
+            <div class="numero-tarjeta">
+              <div id="stats-porcentaje" class="numero-grande">0%</div>
+              <div>los adivinó la IA<br><small id="stats-aciertos"></small></div>
+            </div>
+          </div>
+          <div class="tarjeta-stats">
+            <h3>Lo que más confunde</h3>
+            <ul id="stats-confusiones" class="stats-confusiones"></ul>
+          </div>
+        </div>
+
+        <div class="tarjeta-stats">
+          <h3>Aciertos por categoría</h3>
+          <div id="stats-categorias" class="stats-categorias"></div>
+          <p class="stats-nota">Solo aparecen las categorías que ya se jugaron.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <script src="{{ url_for('static', filename='navegacion.js') }}"></script>
+  <script src="{{ url_for('static', filename='juego.js') }}"></script>
+  <script src="{{ url_for('static', filename='como.js') }}"></script>
+  <script src="{{ url_for('static', filename='estadisticas.js') }}"></script>
 </body>
 </html>
