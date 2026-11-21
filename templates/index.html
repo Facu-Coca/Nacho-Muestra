@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Adiviná el Dibujo con IA</title>
+  <title>¿Qué estoy dibujando?</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header class="cabecera">
-    <h1>Adiviná el Dibujo <span class="subrayado">con IA</span></h1>
+    <h1>¿Qué estoy <span class="subrayado">dibujando</span>?</h1>
     <nav class="menu" aria-label="Secciones">
       <button type="button" class="pestana activa" data-pestana="jugar">Jugar</button>
       <button type="button" class="pestana" data-pestana="como">Cómo funciona</button>
@@ -50,7 +50,6 @@
             </div>
             <p id="mensaje-ronda" class="mensaje-ronda" hidden></p>
             <p id="detalle-ronda" class="detalle-ronda" hidden></p>
-            <button id="siguiente" type="button" class="boton" hidden>Siguiente dibujo</button>
           </section>
 
           <aside class="panel-ia">
@@ -62,26 +61,116 @@
         </div>
       </main>
     </div>
+
+    <!-- Pantalla final: puntaje y los 6 dibujos con lo que creyó la IA -->
+    <div id="pantalla-final" class="pantalla final" hidden>
+      <h2 id="final-titulo" class="final-titulo">¡Terminaste!</h2>
+      <p id="final-puntaje" class="final-puntaje"></p>
+      <div id="final-dibujos" class="final-dibujos"></div>
+      <button id="jugar-de-nuevo" type="button" class="boton grande">Jugar de nuevo</button>
+    </div>
   </section>
 
   <!-- ============ PESTAÑA: CÓMO FUNCIONA ============ -->
   <section id="pestana-como" class="pestana-contenido" hidden>
-    <div class="tarjeta-inicio">
-      <h2>Cómo funciona</h2>
-      <p class="pista">Acá va a ir la explicación de cómo la IA ve y decide. (Próximamente)</p>
+    <div class="como">
+      <h2 class="como-titulo">Cómo funciona</h2>
+
+      <!-- Esquema: dibujo -> imagen 28x28 -> red neuronal -> resultado (usa tu último dibujo) -->
+      <div class="esquema">
+        <figure class="paso">
+          <div class="paso-caja"><img id="como-dibujo" alt="Tu último dibujo" hidden><span class="paso-vacio">?</span></div>
+          <figcaption>1. Tu dibujo</figcaption>
+        </figure>
+        <span class="flecha" aria-hidden="true">→</span>
+        <figure class="paso">
+          <div class="paso-caja"><img id="como-vista" class="pixelado" alt="Lo que ve la IA, 28 por 28 puntos" hidden><span class="paso-vacio">?</span></div>
+          <figcaption>2. Lo que ve la IA<br><small>(28×28 puntos)</small></figcaption>
+        </figure>
+        <span class="flecha" aria-hidden="true">→</span>
+        <figure class="paso">
+          <div class="paso-caja paso-red">
+            <span>rayitas y curvas</span><span class="mini-flecha">↓</span>
+            <span>formas más grandes</span><span class="mini-flecha">↓</span>
+            <span>decide la categoría</span>
+          </div>
+          <figcaption>3. La red neuronal<br><small>(analiza por capas)</small></figcaption>
+        </figure>
+        <span class="flecha" aria-hidden="true">→</span>
+        <figure class="paso">
+          <div class="paso-caja paso-resultado"><div id="como-resultado"><span class="paso-vacio">?</span></div></div>
+          <figcaption>4. El resultado<br><small>(las 3 más probables)</small></figcaption>
+        </figure>
+      </div>
+      <p id="como-aviso" class="como-aviso">Jugá una ronda y acá vas a ver lo que vio la IA en tu último dibujo.</p>
+
+      <!-- Textos de Vicente -->
+      <div class="como-textos">
+        <article class="como-texto">
+          <h3>Qué es esta IA</h3>
+          <p>Es una red neuronal, un programa que aprende mirando ejemplos en vez de seguir reglas escritas a mano. Es del mismo tipo que usan los celulares para reconocer caras u objetos en las fotos.</p>
+        </article>
+        <article class="como-texto">
+          <h3>Cómo aprendió</h3>
+          <p>La entrenamos con millones de dibujos hechos por gente de todo el mundo, del set público Quick, Draw!. Vio muchísimos elefantes, casas y bicicletas dibujados de mil formas distintas, y fue aprendiendo qué tienen en común los de cada categoría.</p>
+        </article>
+        <article class="como-texto">
+          <h3>Qué ve cuando dibujás</h3>
+          <p>La IA no ve tu dibujo como lo ves vos: lo convierte en una imagen chiquita de 28×28 puntos, en blanco y negro. Con esa imagen calcula qué tan parecido es a cada una de las 25 cosas que conoce, y te muestra las 3 más probables.</p>
+        </article>
+        <article class="como-texto">
+          <h3>Por qué a veces se equivoca</h3>
+          <p>Solo conoce 25 categorías, y algunas se parecen entre sí. Además, si el dibujo es muy chico, está incompleto o tiene un garabato, la imagen que ve queda confusa. No piensa ni entiende: compara formas, y las compara con lo que aprendió.</p>
+        </article>
+      </div>
     </div>
   </section>
 
   <!-- ============ PESTAÑA: ESTADÍSTICAS ============ -->
   <section id="pestana-stats" class="pestana-contenido" hidden>
-    <div class="tarjeta-inicio">
-      <h2>Estadísticas</h2>
-      <p class="pista">Acá van a ir los dibujos jugados y cuánto acierta la IA. (Próximamente)</p>
+    <div class="stats">
+      <h2 class="como-titulo">Estadísticas</h2>
+
+      <div id="stats-vacio" class="tarjeta-inicio" hidden>
+        <h2>Todavía no hay dibujos</h2>
+        <p>Jugá una ronda y acá vas a ver cuánto acierta la IA.</p>
+      </div>
+      <div id="stats-error" class="tarjeta-inicio" hidden>
+        <h2>No pude cargar las estadísticas</h2>
+        <p>Fijate que el servidor (python app.py) esté corriendo.</p>
+      </div>
+
+      <div id="stats-contenido" class="stats-contenido" hidden>
+        <div class="stats-izq">
+          <div class="stats-numeros">
+            <div class="numero-tarjeta">
+              <div id="stats-jugados" class="numero-grande">0</div>
+              <div>dibujos jugados</div>
+            </div>
+            <div class="numero-tarjeta">
+              <div id="stats-porcentaje" class="numero-grande">0%</div>
+              <div>los adivinó la IA<br><small id="stats-aciertos"></small></div>
+            </div>
+          </div>
+          <div class="tarjeta-stats">
+            <h3>Lo que más confunde</h3>
+            <ul id="stats-confusiones" class="stats-confusiones"></ul>
+          </div>
+        </div>
+
+        <div class="tarjeta-stats">
+          <h3>Aciertos por categoría</h3>
+          <div id="stats-categorias" class="stats-categorias"></div>
+          <p class="stats-nota">Solo aparecen las categorías que ya se jugaron.</p>
+        </div>
+      </div>
     </div>
   </section>
 
   <script src="{{ url_for('static', filename='app.js') }}"></script>
   <script src="{{ url_for('static', filename='navegacion.js') }}"></script>
   <script src="{{ url_for('static', filename='juego.js') }}"></script>
+  <script src="{{ url_for('static', filename='como.js') }}"></script>
+  <script src="{{ url_for('static', filename='estadisticas.js') }}"></script>
 </body>
 </html>

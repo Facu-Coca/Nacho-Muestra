@@ -3,7 +3,7 @@
 // Todo vive en la misma página: solo se muestra u oculta con el atributo "hidden".
 
 const PESTANAS = ["jugar", "como", "stats"];
-const PANTALLAS = ["inicio", "juego"];   // el 2.5 le suma "final"
+const PANTALLAS = ["inicio", "juego", "final"];
 
 function mostrarPestana(nombre) {
   // si se va de "Jugar" en medio de una ronda, la ronda se cancela
@@ -11,6 +11,8 @@ function mostrarPestana(nombre) {
   PESTANAS.forEach(n => {
     document.getElementById("pestana-" + n).hidden = (n !== nombre);
   });
+  if (nombre === "como" && typeof actualizarComoFunciona === "function") actualizarComoFunciona();
+  if (nombre === "stats" && typeof actualizarEstadisticas === "function") actualizarEstadisticas();
   document.querySelectorAll(".pestana").forEach(boton => {
     boton.classList.toggle("activa", boton.dataset.pestana === nombre);
   });

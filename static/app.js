@@ -81,6 +81,7 @@ botonBorrar.addEventListener("click", limpiar);
 const panelOpciones = document.getElementById("opciones");
 const MEDIO_SEGUNDO = 500;
 
+let ultimoDibujo = null;    // { imagen, vistaIA, top } del último dibujo que vio la IA (lo usa "Cómo funciona")
 let hayCambio = false;      // true si se dibujó algo desde el último envío
 let enviando = false;       // evita mandar un pedido nuevo si el anterior no volvió
 let version = 0;            // sube cada vez que se borra: descarta respuestas viejas
@@ -127,10 +128,11 @@ async function predecir() {
   enviando = true;
   const miVersion = version;
   try {
+    const imagen = lienzo.toDataURL("image/png");
     const r = await fetch("/predecir", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imagen: lienzo.toDataURL("image/png") }),
+      body: JSON.stringify({ imagen }),
     });
     const res = await r.json();
     if (miVersion !== version) return;           // se borró mientras esperábamos
@@ -140,6 +142,7 @@ async function predecir() {
       mostrarPista("Empezá a dibujar y la IA te va a ir diciendo qué ve.");
     } else {
       mostrarOpciones(res.top);
+      ultimoDibujo = { imagen, vistaIA: res.vista_ia, top: res.top };
       // Aviso para que juego.js pueda ver si la IA acertó
       lienzo.dispatchEvent(new CustomEvent("prediccion", { detail: res }));
     }

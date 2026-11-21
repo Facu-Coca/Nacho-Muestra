@@ -1,6 +1,6 @@
 // Modo juego: una ronda de 6 dibujos, cada uno con una categoría al azar y 20 segundos.
 // 2.2: consigna + cuenta regresiva.  2.3: acierto, puntos y avance automático.
-// 2.4: guarda cada dibujo en /guardar.  (2.5 agrega la pantalla final.)
+// 2.4: guarda cada dibujo en /guardar.  2.5: pantalla final con los 6 dibujos.
 
 const TOTAL_DIBUJOS = 6;
 const SEGUNDOS_POR_DIBUJO = 20;
@@ -21,7 +21,6 @@ const elBarra = document.getElementById("reloj-barra");
 const elSegundos = document.getElementById("reloj-segundos");
 const elMensaje = document.getElementById("mensaje-ronda");
 const elDetalle = document.getElementById("detalle-ronda");
-const botonSiguiente = document.getElementById("siguiente");
 
 let todasLasCategorias = null;   // la lista que devuelve GET /categorias
 let ronda = null;                // { pedidas, indice, puntos, resultados }
@@ -70,7 +69,7 @@ async function iniciarRonda() {
     pedidas: mezclar(todasLasCategorias).slice(0, TOTAL_DIBUJOS),
     indice: 0,
     puntos: 0,
-    resultados: [],   // uno por dibujo: { pedida, adivino, creyo, imagen, guardado } (lo usa el 2.5)
+    resultados: [],   // uno por dibujo: { pedida, adivino, creyo, imagen, guardado }
   };
   mostrarPantalla("juego");
   empezarDibujo();
@@ -82,7 +81,6 @@ function empezarDibujo() {
   mostrarContador();
   elMensaje.hidden = true;
   elDetalle.hidden = true;
-  botonSiguiente.hidden = true;
 
   estado = "dibujando";
   ultimaOpcion = null;
@@ -158,15 +156,50 @@ function terminarDibujo(adivino) {
   }
 
   const esElUltimo = ronda.indice === ronda.pedidas.length - 1;
-  if (esElUltimo) {
-    // 2.5 va a reemplazar esto por la pantalla final
-    elDetalle.textContent = `Se terminó la ronda: ${ronda.puntos} de ${ronda.pedidas.length}.`;
-    elDetalle.hidden = false;
-    botonSiguiente.textContent = "Terminar";
-    botonSiguiente.hidden = false;
-  } else {
-    pausa = setTimeout(siguienteDibujo, PAUSA_ENTRE_DIBUJOS_MS);
-  }
+  // Se ve un momento el resultado de este dibujo y después sigue (o va a la pantalla final)
+  pausa = setTimeout(esElUltimo ? mostrarFinal : siguienteDibujo, PAUSA_ENTRE_DIBUJOS_MS);
+}
+
+// ---------------------------------------------------------------
+// Pantalla final
+// ---------------------------------------------------------------
+function crear(etiqueta, clase, texto) {
+  const e = document.createElement(etiqueta);
+  if (clase) e.className = clase;
+  if (texto !== undefined) e.textContent = texto;
+  return e;
+}
+
+function fraseFinal(puntos, total) {
+  if (puntos === total) return "¡Perfecto! La IA entendió todos tus dibujos.";
+  if (puntos >= total * 2 / 3) return "¡Muy bien! La IA entendió casi todo.";
+  if (puntos >= total / 3) return "¡No estuvo mal! ¿Probamos otra vez?";
+  return "¡La IA la tuvo difícil! ¿Revancha?";
+}
+
+function mostrarFinal() {
+  const total = ronda.resultados.length;
+  document.getElementById("final-puntaje").textContent =
+    `La IA adivinó ${ronda.puntos} de ${total}. ${fraseFinal(ronda.puntos, total)}`;
+
+  const contenedor = document.getElementById("final-dibujos");
+  contenedor.innerHTML = "";
+  ronda.resultados.forEach((r) => {
+    const tarjeta = crear("figure", "dibujo-final " + (r.adivino ? "ok" : "mal"));
+
+    const img = crear("img");
+    img.src = r.imagen;
+    img.alt = "Dibujo de " + r.pedida;
+
+    const pedida = crear("figcaption", "dibujo-pedida", (r.adivino ? "✔ " : "✘ ") + r.pedida);
+    const creyo = crear("div", "dibujo-creyo",
+      r.adivino ? "La IA lo adivinó"
+                : (r.creyo ? "La IA creyó: " + r.creyo : "La IA no vio nada"));
+
+    tarjeta.append(img, pedida, creyo);
+    contenedor.appendChild(tarjeta);
+  });
+  mostrarPantalla("final");
 }
 
 function siguienteDibujo() {
@@ -194,5 +227,5 @@ lienzo.addEventListener("prediccion", (e) => {
   }
 });
 
-botonSiguiente.addEventListener("click", cancelarRonda);   // solo aparece al final de la ronda
+document.getElementById("jugar-de-nuevo").addEventListener("click", iniciarRonda);
 document.getElementById("jugar").addEventListener("click", iniciarRonda);

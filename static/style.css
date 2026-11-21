@@ -98,6 +98,173 @@ body {
 
 .boton.grande { font-size: 2rem; padding: 12px 56px; margin-top: 12px; }
 
+/* ---------- Pestaña "Cómo funciona" ---------- */
+.como { max-width: 1400px; margin: 0 auto; }
+.como-titulo { text-align: center; font-size: clamp(1.8rem, 3.4vw, 2.6rem); margin: 4px 0 14px; }
+
+.esquema { display: flex; align-items: center; justify-content: center; gap: clamp(8px, 1.6vw, 24px); }
+.flecha { font-size: 2.6rem; color: var(--tinta-suave); }
+
+.paso { margin: 0; text-align: center; font-size: 1.15rem; }
+.paso figcaption { margin-top: 8px; }
+.paso small { color: var(--tinta-suave); font-size: .95rem; }
+
+.paso-caja {
+  width: clamp(150px, 14vw, 210px);
+  height: clamp(150px, 14vw, 210px);
+  background: #fff;
+  border: 3px solid var(--tinta);
+  border-radius: 10px;
+  box-shadow: var(--sombra);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.paso-caja img { width: 100%; height: 100%; object-fit: contain; }
+.paso-caja img.pixelado { image-rendering: pixelated; background: #000; }
+.paso-vacio { font-size: 3rem; color: var(--renglon); }
+.paso-caja img:not([hidden]) + .paso-vacio { display: none; }   /* con imagen, el "?" sobra */
+
+.paso-red { flex-direction: column; gap: 2px; background: #eef4ff; padding: 6px; font-size: 1.05rem; }
+.mini-flecha { color: var(--acento); font-size: 1.3rem; line-height: 1; }
+
+.paso-resultado { align-items: stretch; padding: 10px; }
+#como-resultado { display: flex; flex-direction: column; justify-content: center; gap: 6px; width: 100%; font-size: 1.15rem; }
+.resultado-fila { text-transform: capitalize; }
+.resultado-fila.primera { font-weight: bold; font-size: 1.35rem; background: linear-gradient(transparent 55%, var(--resaltador) 55%); }
+
+.como-aviso { text-align: center; color: var(--tinta-suave); font-size: 1.15rem; margin: 12px 0 0; }
+
+.como-textos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.como-texto {
+  background: rgba(255, 255, 255, .92);
+  border: 3px solid var(--tinta);
+  border-radius: 10px;
+  box-shadow: var(--sombra);
+  padding: 8px 18px 14px;
+}
+.como-texto:nth-child(odd) { transform: rotate(-.5deg); }
+.como-texto:nth-child(even) { transform: rotate(.5deg); }
+.como-texto h3 {
+  display: inline-block;
+  margin: 6px 0 8px;
+  font-size: 1.35rem;
+  background: linear-gradient(transparent 55%, var(--resaltador) 55%, var(--resaltador) 92%, transparent 92%);
+}
+.como-texto p { margin: 0; font-size: 1.1rem; line-height: 1.45; }
+
+/* ---------- Pestaña "Estadísticas" ---------- */
+.stats { max-width: 1300px; margin: 0 auto; }
+.stats-contenido { display: grid; grid-template-columns: minmax(280px, 5fr) 7fr; gap: 24px; align-items: start; }
+.stats-izq { display: flex; flex-direction: column; gap: 20px; }
+
+.stats-numeros { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.numero-tarjeta {
+  background: #fff;
+  border: 3px solid var(--tinta);
+  border-radius: 10px;
+  box-shadow: var(--sombra);
+  padding: 10px 12px 14px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+.numero-tarjeta:first-child { transform: rotate(-.6deg); }
+.numero-tarjeta:last-child { transform: rotate(.6deg); }
+.numero-grande { font-size: clamp(2.6rem, 5vw, 4rem); font-weight: bold; line-height: 1.1; }
+.numero-tarjeta small { color: var(--tinta-suave); font-size: 1rem; }
+
+.tarjeta-stats {
+  background: rgba(255, 255, 255, .92);
+  border: 3px solid var(--tinta);
+  border-radius: 10px;
+  box-shadow: var(--sombra);
+  padding: 8px 20px 16px;
+}
+.tarjeta-stats h3 {
+  display: inline-block;
+  margin: 6px 0 10px;
+  font-size: 1.4rem;
+  background: linear-gradient(transparent 55%, var(--resaltador) 55%, var(--resaltador) 92%, transparent 92%);
+}
+
+.stats-confusiones { list-style: none; margin: 0; padding: 0; }
+.confusion {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 1.2rem;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--renglon);
+  text-transform: capitalize;
+}
+.confusion:last-child { border-bottom: 0; }
+.confusion-veces { color: var(--tinta-suave); white-space: nowrap; text-transform: none; }
+.stats-sin-datos { font-size: 1.1rem; color: var(--tinta-suave); }
+
+.stats-categorias { columns: 2 260px; column-gap: 28px; }
+.cat-fila {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr 3.2rem;
+  align-items: center;
+  gap: 8px;
+  break-inside: avoid;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+.cat-nombre { text-transform: capitalize; overflow-wrap: anywhere; }
+.cat-fondo { height: 18px; background: #fff; border: 2px solid var(--tinta); border-radius: 6px; overflow: hidden; }
+.cat-barra { height: 100%; border-radius: 3px; }
+.cat-barra.nivel-bien { background: #3fae6a; }
+.cat-barra.nivel-medio { background: var(--resaltador); }
+.cat-barra.nivel-mal { background: #e0483f; }
+.cat-pct { text-align: right; color: var(--tinta-suave); }
+.stats-nota { margin: 8px 0 0; font-size: .95rem; color: var(--tinta-suave); }
+
+@media (max-width: 900px) { .stats-contenido { grid-template-columns: 1fr; } }
+
+/* ---------- Pantalla final ---------- */
+.final { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 8px; }
+.final-titulo { margin: 0; font-size: clamp(2rem, 4vw, 3.2rem); }
+.final-puntaje { font-size: 1.5rem; margin: 6px 0 18px; }
+
+.final-dibujos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 18px;
+  width: 100%;
+  max-width: 1400px;
+  margin-bottom: 22px;
+}
+
+.dibujo-final {
+  margin: 0;
+  background: #fff;
+  border: 3px solid var(--tinta);
+  border-radius: 10px;
+  box-shadow: var(--sombra);
+  padding: 8px 8px 10px;
+}
+.dibujo-final:nth-child(odd) { transform: rotate(-1deg); }
+.dibujo-final:nth-child(even) { transform: rotate(1deg); }
+.dibujo-final img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #fff;
+  border: 1px solid var(--renglon);
+  border-radius: 4px;
+}
+.dibujo-pedida { font-size: 1.3rem; font-weight: bold; margin-top: 8px; text-transform: capitalize; }
+.dibujo-final.ok .dibujo-pedida { color: #1f8a4c; }
+.dibujo-final.mal .dibujo-pedida { color: #c0392b; }
+.dibujo-creyo { font-size: 1.05rem; color: var(--tinta-suave); }
+
 /* ---------- La hoja donde se dibuja ---------- */
 .hoja {
   background: #fff;
